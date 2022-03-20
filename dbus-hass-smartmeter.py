@@ -25,12 +25,12 @@ except:
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), "../ext/velib_python"))
 from vedbus import VeDbusService
 
-logging.basicConfig(
-    filename="./dbus-hass-smartmeter.log",
-    level=logging.DEBUG,
-    format="%(asctime)s %(levelname)s %(name)s %(message)s",
-    filemode="w",
-)
+# logging.basicConfig(
+#     filename="./dbus-hass-smartmeter.log",
+#     level=logging.DEBUG,
+#     format="%(asctime)s %(levelname)s %(name)s %(message)s",
+#     filemode="w",
+# )
 
 path_UpdateIndex = "/UpdateIndex"
 
