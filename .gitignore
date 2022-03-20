@@ -4,3 +4,4 @@ __pycache__
 .vscode
 .token
 .env
+*.log

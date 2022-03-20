@@ -1,3 +1,4 @@
 #!/bin/sh
-python /data/dbus-fronius-smartmeter/dbus-fronius-smartmeter.py
+cd /data/dbus-hass-smartmeter
+python /data/dbus-hass-smartmeter/dbus-hass-smartmeter.py
 
