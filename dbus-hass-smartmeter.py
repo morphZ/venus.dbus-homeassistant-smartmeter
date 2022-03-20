@@ -29,6 +29,7 @@ logging.basicConfig(
     filename="./dbus-hass-smartmeter.log",
     level=logging.DEBUG,
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
+    filemode="w",
 )
 
 path_UpdateIndex = "/UpdateIndex"
