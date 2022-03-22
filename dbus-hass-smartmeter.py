@@ -26,10 +26,10 @@ sys.path.insert(1, os.path.join(os.path.dirname(__file__), "../ext/velib_python"
 from vedbus import VeDbusService
 
 # logging.basicConfig(
-#     filename="./dbus-hass-smartmeter.log",
+#     # filename="./dbus-hass-smartmeter.log",
 #     level=logging.DEBUG,
 #     format="%(asctime)s %(levelname)s %(name)s %(message)s",
-#     filemode="w",
+#     # filemode="w",
 # )
 
 path_UpdateIndex = "/UpdateIndex"
@@ -90,32 +90,42 @@ class DbusDummyService:
                 settings["initial"],
                 writeable=True,
                 onchangecallback=self._handlechangedvalue,
+                gettextcallback=settings.get("unit"),
             )
 
-        gobject.timeout_add(200, self._update)  # pause 200ms before the next request
+        gobject.timeout_add(2000, self._update)  # pause 200ms before the next request
 
     def _update(self):
         bezug = get_value("sensor.netz_bezug")
         einspeisung = get_value("sensor.netz_einspeisung")
+        u1 = get_value("sensor.netz_u1")
+        u2 = get_value("sensor.netz_u2")
+        u3 = get_value("sensor.netz_u3")
+        i1 = get_value("sensor.netz_i1")
+        i2 = get_value("sensor.netz_i2")
+        i3 = get_value("sensor.netz_i3")
+        cosphi = get_value("sensor.netz_cosphi")
+
+        logging.debug(f"{bezug=}, {einspeisung=}")
         meter_consumption = bezug - einspeisung
 
-        self._dbusservice[
-            "/Ac/Power"
-        ] = meter_consumption  # positive: consumption, negative: feed into grid
-        # self._dbusservice["/Ac/L1/Voltage"] = 0.0
-        # self._dbusservice["/Ac/L2/Voltage"] = 0.0
-        # self._dbusservice["/Ac/L3/Voltage"] = 0.0
-        # self._dbusservice["/Ac/L1/Current"] = 0.0
-        # self._dbusservice["/Ac/L2/Current"] = 0.0
-        # self._dbusservice["/Ac/L3/Current"] = 0.0
-        # self._dbusservice["/Ac/L1/Power"] = 0.0
-        # self._dbusservice["/Ac/L2/Power"] = 0.0
-        # self._dbusservice["/Ac/L3/Power"] = 0.0
+        self._dbusservice["/Ac/Power"] = (
+            1000.0 * meter_consumption
+        )  # positive: consumption, negative: feed into grid
+        self._dbusservice["/Ac/L1/Voltage"] = u1
+        self._dbusservice["/Ac/L2/Voltage"] = u2
+        self._dbusservice["/Ac/L3/Voltage"] = u3
+        self._dbusservice["/Ac/L1/Current"] = i1
+        self._dbusservice["/Ac/L2/Current"] = i2
+        self._dbusservice["/Ac/L3/Current"] = i3
+        self._dbusservice["/Ac/L1/Power"] = u1 * i1 * cosphi
+        self._dbusservice["/Ac/L2/Power"] = u2 * i2 * cosphi
+        self._dbusservice["/Ac/L3/Power"] = u3 * i3 * cosphi
         self._dbusservice["/Ac/Energy/Forward"] = get_value("sensor.zahlerstand_bezug")
         self._dbusservice["/Ac/Energy/Reverse"] = get_value(
             "sensor.zahlerstand_einspeisung"
         )
-        logging.info("House Consumption: {:.1f}".format(meter_consumption))
+        logging.info("House Consumption: {:.0f}".format(meter_consumption))
         # increment UpdateIndex - to show that new data is available
         index = self._dbusservice[path_UpdateIndex] + 1  # increment index
         if index > 255:  # maximum value of the index
@@ -129,7 +139,7 @@ class DbusDummyService:
 
 
 def main():
-    logging.basicConfig(level=logging.DEBUG)  # use .INFO for less logging
+    logging.basicConfig(level=logging.INFO)  # use .INFO for less logging
     thread.daemon = True  # allow the program to quit
 
     from dbus.mainloop.glib import DBusGMainLoop
@@ -137,22 +147,33 @@ def main():
     # Have a mainloop, so we can send/receive asynchronous calls to and from dbus
     DBusGMainLoop(set_as_default=True)
 
+    _kwh = lambda p, v: (f"{v:.0f}kWh")
+    _a = lambda p, v: (f"{v:.1f}A")
+    _w = lambda p, v: (f"{v:.0f}W")
+    _v = lambda p, v: (f"{v:.1f}V")
+
     pvac_output = DbusDummyService(
         servicename="com.victronenergy.grid",
         deviceinstance=0,
         paths={
-            "/Ac/Power": {"initial": 0},
-            "/Ac/L1/Voltage": {"initial": 0},
-            "/Ac/L2/Voltage": {"initial": 0},
-            "/Ac/L3/Voltage": {"initial": 0},
-            "/Ac/L1/Current": {"initial": 0},
-            "/Ac/L2/Current": {"initial": 0},
-            "/Ac/L3/Current": {"initial": 0},
-            "/Ac/L1/Power": {"initial": 0},
-            "/Ac/L2/Power": {"initial": 0},
-            "/Ac/L3/Power": {"initial": 0},
-            "/Ac/Energy/Forward": {"initial": 0},  # energy bought from the grid
-            "/Ac/Energy/Reverse": {"initial": 0},  # energy sold to the grid
+            "/Ac/Power": {"initial": 0, "unit": _w},
+            "/Ac/L1/Voltage": {"initial": 0, "unit": _v},
+            "/Ac/L2/Voltage": {"initial": 0, "unit": _v},
+            "/Ac/L3/Voltage": {"initial": 0, "unit": _v},
+            "/Ac/L1/Current": {"initial": 0, "unit": _a},
+            "/Ac/L2/Current": {"initial": 0, "unit": _a},
+            "/Ac/L3/Current": {"initial": 0, "unit": _a},
+            "/Ac/L1/Power": {"initial": 0, "unit": _w},
+            "/Ac/L2/Power": {"initial": 0, "unit": _w},
+            "/Ac/L3/Power": {"initial": 0, "unit": _w},
+            "/Ac/Energy/Forward": {
+                "initial": 0,
+                "unit": _kwh,
+            },  # energy bought from the grid
+            "/Ac/Energy/Reverse": {
+                "initial": 0,
+                "unit": _kwh,
+            },  # energy sold to the grid
             path_UpdateIndex: {"initial": 0},
         },
     )
