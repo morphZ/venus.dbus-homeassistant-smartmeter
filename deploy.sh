@@ -7,9 +7,9 @@ SSH="ssh $USER_HOST"
 
 $SSH mkdir -p $FOLDER/service
 
+echo "Copy files to $USER_HOST:$FOLDER"
 for f in dbus-hass-smartmeter.py service/run kill_me.sh ve_utils.py vedbus.py .token
 do
-  echo "Copy $f to $USER_HOST:$FOLDER"
   scp $f $USER_HOST:$FOLDER/$f
 done
 
@@ -19,7 +19,10 @@ $SSH chmod 0744 $FOLDER/kill_me.sh
 $SSH chmod 0600 $FOLDER/.token
 
 echo "Creating symlinks"
-$SSH ln -s $FOLDER/service /service/$MODULE
+CREATE_LN="ln -sfn $FOLDER/service /service/$MODULE  # $MODULE"
+$SSH "touch /data/rc.local && chmod 0755 /data/rc.local"
+$SSH "grep -qF '# $MODULE' /data/rc.local || echo '$CREATE_LN' >> /data/rc.local"
+$SSH $CREATE_LN
 
 echo "Kill old services"
 $SSH $FOLDER/kill_me.sh
