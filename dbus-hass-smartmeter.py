@@ -125,7 +125,7 @@ class DbusDummyService:
         self._dbusservice["/Ac/Energy/Reverse"] = get_value(
             "sensor.zahlerstand_einspeisung"
         )
-        logging.info("House Consumption: {:.0f}".format(meter_consumption))
+        logging.info("House Consumption: {:.2f}".format(meter_consumption))
         # increment UpdateIndex - to show that new data is available
         index = self._dbusservice[path_UpdateIndex] + 1  # increment index
         if index > 255:  # maximum value of the index
