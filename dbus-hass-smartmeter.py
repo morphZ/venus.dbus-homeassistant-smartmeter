@@ -104,23 +104,26 @@ class DbusDummyService:
         i1 = get_value("sensor.netz_i1")
         i2 = get_value("sensor.netz_i2")
         i3 = get_value("sensor.netz_i3")
-        cosphi = get_value("sensor.netz_cosphi")
 
         logging.debug(f"{bezug=}, {einspeisung=}")
         meter_consumption = bezug - einspeisung
+        faktor = meter_consumption * 1000.0 / (u1*i1 + u2*i2 + u3*i3)
 
         self._dbusservice["/Ac/Power"] = (
             1000.0 * meter_consumption
         )  # positive: consumption, negative: feed into grid
+        self._dbusservice["/Ac/L1/Power"] = meter_consumption * 1000 / 3
+        self._dbusservice["/Ac/L2/Power"] = meter_consumption * 1000 / 3
+        self._dbusservice["/Ac/L3/Power"] = meter_consumption * 1000 / 3
         self._dbusservice["/Ac/L1/Voltage"] = u1
         self._dbusservice["/Ac/L2/Voltage"] = u2
         self._dbusservice["/Ac/L3/Voltage"] = u3
         self._dbusservice["/Ac/L1/Current"] = i1
         self._dbusservice["/Ac/L2/Current"] = i2
         self._dbusservice["/Ac/L3/Current"] = i3
-        self._dbusservice["/Ac/L1/Power"] = u1 * i1 * cosphi
-        self._dbusservice["/Ac/L2/Power"] = u2 * i2 * cosphi
-        self._dbusservice["/Ac/L3/Power"] = u3 * i3 * cosphi
+        self._dbusservice["/Ac/L1/Power"] = u1 * i1 * faktor
+        self._dbusservice["/Ac/L2/Power"] = u2 * i2 * faktor
+        self._dbusservice["/Ac/L3/Power"] = u3 * i3 * faktor
         self._dbusservice["/Ac/Energy/Forward"] = get_value("sensor.zahlerstand_bezug")
         self._dbusservice["/Ac/Energy/Reverse"] = get_value(
             "sensor.zahlerstand_einspeisung"
