@@ -112,9 +112,6 @@ class DbusDummyService:
         self._dbusservice["/Ac/Power"] = (
             1000.0 * meter_consumption
         )  # positive: consumption, negative: feed into grid
-        self._dbusservice["/Ac/L1/Power"] = meter_consumption * 1000 / 3
-        self._dbusservice["/Ac/L2/Power"] = meter_consumption * 1000 / 3
-        self._dbusservice["/Ac/L3/Power"] = meter_consumption * 1000 / 3
         self._dbusservice["/Ac/L1/Voltage"] = u1
         self._dbusservice["/Ac/L2/Voltage"] = u2
         self._dbusservice["/Ac/L3/Voltage"] = u3
@@ -156,8 +153,8 @@ def main():
     _v = lambda p, v: (f"{v:.1f}V")
 
     pvac_output = DbusDummyService(
-        servicename="com.victronenergy.grid",
-        deviceinstance=0,
+        servicename="com.victronenergy.grid.ha1",
+        deviceinstance=30,
         paths={
             "/Ac/Power": {"initial": 0, "unit": _w},
             "/Ac/L1/Voltage": {"initial": 0, "unit": _v},
