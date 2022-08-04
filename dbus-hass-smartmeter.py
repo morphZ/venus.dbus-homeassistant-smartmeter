@@ -25,12 +25,10 @@ except:
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), "../ext/velib_python"))
 from vedbus import VeDbusService
 
-# logging.basicConfig(
-#     # filename="./dbus-hass-smartmeter.log",
-#     level=logging.DEBUG,
-#     format="%(asctime)s %(levelname)s %(name)s %(message)s",
-#     # filemode="w",
-# )
+logging.basicConfig(
+    level=logging.WARNING,
+    format="%(asctime)s %(levelname)s %(name)s %(message)s",
+)
 
 path_UpdateIndex = "/UpdateIndex"
 
@@ -109,7 +107,7 @@ class DbusDummyService:
 
         logging.debug(f"{bezug=}, {einspeisung=}")
         meter_consumption = bezug - einspeisung
-        faktor = meter_consumption * 1000.0 / (u1*i1 + u2*i2 + u3*i3)
+        faktor = meter_consumption * 1000.0 / (u1 * i1 + u2 * i2 + u3 * i3)
 
         self._dbusservice["/Ac/Power"] = (
             1000.0 * meter_consumption
