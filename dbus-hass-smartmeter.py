@@ -95,7 +95,7 @@ class DbusDummyService:
                 gettextcallback=settings.get("unit"),
             )
 
-        gobject.timeout_add(2000, self._update)  # pause 200ms before the next request
+        gobject.timeout_add(1000, self._update)  # pause 200ms before the next request
 
     def _update(self):
         bezug = get_value("sensor.netz_bezug")
