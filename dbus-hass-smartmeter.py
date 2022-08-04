@@ -46,7 +46,9 @@ def get_value(entity_id):
     }
 
     meter_r = requests.get(
-        url=meter_url, headers=header
+        url=meter_url,
+        headers=header,
+        timeout=5,
     )  # request data from the Home Assistant PV inverter
     meter_data = meter_r.json()  # convert JSON data
     return float(meter_data["state"])
