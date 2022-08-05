@@ -1,4 +1,5 @@
 #!/bin/sh
+echo "*** starting dbus-hass-smartmeter ***"
+exec 2>&1
 cd /data/dbus-hass-smartmeter
-python /data/dbus-hass-smartmeter/dbus-hass-smartmeter.py
-
+exec softlimit -d 100000000 -s 1000000 -a 100000000 /data/dbus-hass-smartmeter/dbus-hass-smartmeter.py

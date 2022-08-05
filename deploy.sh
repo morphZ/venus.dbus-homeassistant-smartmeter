@@ -5,16 +5,16 @@ FOLDER=/data/$MODULE
 USER_HOST=root@venus
 SSH="ssh $USER_HOST"
 
-$SSH mkdir -p $FOLDER/service
+$SSH mkdir -p $FOLDER/service/log
 
 echo "Copy files to $USER_HOST:$FOLDER"
-for f in dbus-hass-smartmeter.py service/run kill_me.sh ve_utils.py vedbus.py .token
+for f in dbus-hass-smartmeter.py service/run kill_me.sh ve_utils.py vedbus.py .token service/log/run
 do
   scp $f $USER_HOST:$FOLDER/$f
 done
 
 echo "Set permissions"
-$SSH chmod 0755 $FOLDER/service/run
+$SSH chmod 0755 $FOLDER/service/run $FOLDER/service/log/run
 $SSH chmod 0744 $FOLDER/kill_me.sh
 $SSH chmod 0600 $FOLDER/.token
 
