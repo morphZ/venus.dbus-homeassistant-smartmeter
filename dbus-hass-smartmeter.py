@@ -1,4 +1,5 @@
-#!/usr/bin/env python
+#!/usr/bin/python3 -u
+# -*- coding: utf-8 -*-
 
 """
 Created by Ralf Zimmermann (mail@ralfzimmermann.de) in 2020.
@@ -26,7 +27,7 @@ sys.path.insert(1, os.path.join(os.path.dirname(__file__), "../ext/velib_python"
 from vedbus import VeDbusService
 
 logging.basicConfig(
-    level=logging.WARNING,
+    level=logging.DEBUG,
     format="%(asctime)s %(levelname)s %(name)s %(message)s",
 )
 
