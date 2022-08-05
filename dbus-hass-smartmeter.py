@@ -25,6 +25,7 @@ except:
 # our own packages
 sys.path.insert(1, os.path.join(os.path.dirname(__file__), "../ext/velib_python"))
 from vedbus import VeDbusService
+from ve_utils import exit_on_error
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -97,14 +98,14 @@ class DbusDummyService:
         gobject.timeout_add(1000, self._update)  # pause 200ms before the next request
 
     def _update(self):
-        bezug = get_value("sensor.netz_bezug")
-        einspeisung = get_value("sensor.netz_einspeisung")
-        u1 = get_value("sensor.netz_u1")
-        u2 = get_value("sensor.netz_u2")
-        u3 = get_value("sensor.netz_u3")
-        i1 = get_value("sensor.netz_i1")
-        i2 = get_value("sensor.netz_i2")
-        i3 = get_value("sensor.netz_i3")
+        bezug = exit_on_error(get_value, "sensor.netz_bezug")
+        einspeisung = exit_on_error(get_value, "sensor.netz_einspeisung")
+        u1 = exit_on_error(get_value, "sensor.netz_u1")
+        u2 = exit_on_error(get_value, "sensor.netz_u2")
+        u3 = exit_on_error(get_value, "sensor.netz_u3")
+        i1 = exit_on_error(get_value, "sensor.netz_i1")
+        i2 = exit_on_error(get_value, "sensor.netz_i2")
+        i3 = exit_on_error(get_value, "sensor.netz_i3")
 
         logging.debug(f"{bezug=}, {einspeisung=}")
         meter_consumption = bezug - einspeisung
